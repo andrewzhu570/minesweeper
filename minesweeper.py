@@ -1,0 +1,90 @@
+# Andrew Zhu kuh4de
+import random
+
+class Cell:
+    def __init__(self):
+        self.has_mine = False
+        self.revealed = False
+        self.flagged = False
+        self.neighbor_mines = 0
+
+
+class Board:
+    def __init__(self, size=10, num_mines=10):
+        self.size = size
+        self.num_mines = num_mines
+        self.game_over = False
+
+        self.grid = [[Cell() for _ in range(size)] for _ in range(size)]
+
+        self.place_mines()
+        self.compute_numbers()
+
+
+    def place_mines(self):
+        """Randomly chooses cells to place mines until the amount of mines needed is reached"""
+        placed = 0
+        while placed < self.num_mines:
+            r = random.randint(0, self.size - 1)
+            c = random.randint(0, self.size - 1)
+
+            cell = self.grid[r][c]
+
+            if not cell.has_mine:
+                cell.has_mine = True
+                placed += 1
+
+    def count_neighbors(self, r, c):
+        """Counts how many neighboring cells have mines"""
+        directions = [(-1,-1), (-1,0), (-1,1),
+                      (0,-1),         (0,1),
+                      (1,-1),  (1,0), (1,1)]
+        count = 0
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+
+            if 0 <= nr < self.size and 0 <= nc < self.size:
+                if self.grid[nr][nc].has_mine:
+                    count += 1
+
+        return count
+
+    def compute_numbers(self):
+        """Assigns the neightbor_mines field of each cell to an integer using count_neighbors()"""
+        for r in range(self.size):
+            for c in range(self.size):
+                if not self.grid[r][c].has_mine:
+                    self.grid[r][c].neighbor_mines = self.count_neighbors(r, c)
+
+    def reveal(self, r, c):
+        """Reveals each cell that is clicked"""
+        if not (0 <= r < self.size and 0 <= c < self.size):
+            return
+        cell = self.grid[r][c]
+        if cell.revealed or cell.flagged:
+            return
+        cell.revealed = True
+        if cell.has_mine:
+            self.game_over = True
+            return
+        if cell.neighbor_mines > 0:
+            return
+        directions = [(-1, -1), (-1, 0), (-1, 1),
+                      (0, -1), (0, 1),
+                      (1, -1), (1, 0), (1, 1)]
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+
+            if 0 <= nr < self.size and 0 <= nc < self.size:
+                self.reveal(nr, nc)
+
+
+    def display_board(self):
+        for row in self.grid:
+            print(" ".join(
+                "💣" if cell.has_mine else str(cell.neighbor_mines) + " "
+                for cell in row
+            ))
+
+board = Board(10, 10)
+board.display_board()
