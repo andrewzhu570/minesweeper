@@ -80,19 +80,57 @@ class Board:
 
     def display_board(self):
         for row in self.grid:
-            print(" ".join(
-                ". " if not cell.revealed else str(cell.neighbor_mines) + " "
-                for cell in row
-            ))
+            display_row = []
+            for cell in row:
+                if not cell.revealed:
+                    value = "."
+                elif cell.has_mine:
+                    value = "*"
+                elif cell.neighbor_mines == 0:
+                    value = " "
+                else:
+                    value = str(cell.neighbor_mines)
+                display_row.append(value)
+            print("  ".join(display_row))
+
+    def reveal_all(self):
+        for row in self.grid:
+            display_row = []
+            for cell in row:
+                if cell.has_mine:
+                    value = "*"
+                elif cell.neighbor_mines == 0:
+                    value = " "
+                else:
+                    value = str(cell.neighbor_mines)
+                display_row.append(value)
+            print("  ".join(display_row))
+    def check_win(self):
+        for row in self.grid:
+            for cell in row:
+                if not cell.has_mine and not cell.revealed:
+                    return False
+        return True
 
     def play_game(self):
         while not self.game_over:
             self.display_board()
-            row = int(input("Row: "))
-            col = int(input("Column: "))
-
+            try:
+                row = int(input("Row: "))
+                col = int(input("Column: "))
+            except ValueError:
+                print("Invalid input!")
+                continue
+            if not (0 <= row < self.size and 0 <= col < self.size):
+                print("Out of range")
+                continue
             self.reveal(row, col)
+            if self.check_win():
+                print("You win!")
+                self.display_board()
+                return
+        self.reveal_all()
         print("Game Over!")
 
-board = Board(10, 10)
+board = Board(2, 1)
 board.play_game()
