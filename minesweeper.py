@@ -78,13 +78,21 @@ class Board:
             if 0 <= nr < self.size and 0 <= nc < self.size:
                 self.reveal(nr, nc)
 
-
     def display_board(self):
         for row in self.grid:
             print(" ".join(
-                "💣" if cell.has_mine else str(cell.neighbor_mines) + " "
+                ". " if not cell.revealed else str(cell.neighbor_mines) + " "
                 for cell in row
             ))
 
+    def play_game(self):
+        while not self.game_over:
+            self.display_board()
+            row = int(input("Row: "))
+            col = int(input("Column: "))
+
+            self.reveal(row, col)
+        print("Game Over!")
+
 board = Board(10, 10)
-board.display_board()
+board.play_game()
