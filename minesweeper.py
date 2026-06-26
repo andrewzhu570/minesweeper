@@ -14,6 +14,7 @@ class Board:
         self.size = size
         self.num_mines = num_mines
         self.game_over = False
+        self.first_click = True
 
         self.grid = [[Cell() for _ in range(size)] for _ in range(size)]
 
@@ -50,11 +51,12 @@ class Board:
         return count
 
     def compute_numbers(self):
-        """Assigns the neightbor_mines field of each cell to an integer using count_neighbors()"""
+        """Assigns the neighbor_mines field of each cell to an integer using count_neighbors()"""
         for r in range(self.size):
             for c in range(self.size):
                 if not self.grid[r][c].has_mine:
                     self.grid[r][c].neighbor_mines = self.count_neighbors(r, c)
+                else: self.grid[r][c].neighbor_mines = 0
 
     def reveal(self, r, c):
         """Reveals each cell that is clicked"""
@@ -105,12 +107,27 @@ class Board:
                     value = str(cell.neighbor_mines)
                 display_row.append(value)
             print("  ".join(display_row))
+
     def check_win(self):
         for row in self.grid:
             for cell in row:
                 if not cell.has_mine and not cell.revealed:
                     return False
         return True
+
+    def move_mine(self, r, c):
+        self.grid[r][c].has_mine = False
+        found_space = False
+        while not found_space:
+            rr = random.randint(0, self.size - 1)
+            rc = random.randint(0, self.size - 1)
+            if rr == r and rc == c:
+                continue
+            cell = self.grid[rr][rc]
+
+            if not cell.has_mine:
+                cell.has_mine = True
+                found_space = True
 
     def play_game(self):
         while not self.game_over:
@@ -124,6 +141,11 @@ class Board:
             if not (0 <= row < self.size and 0 <= col < self.size):
                 print("Out of range")
                 continue
+            if self.first_click:
+                if self.grid[row][col].has_mine:
+                    self.move_mine(row, col)
+                    self.compute_numbers()
+                self.first_click = False
             self.reveal(row, col)
             if self.check_win():
                 print("You win!")
@@ -132,5 +154,5 @@ class Board:
         self.reveal_all()
         print("Game Over!")
 
-board = Board(2, 1)
+board = Board(5, 5)
 board.play_game()
