@@ -84,7 +84,9 @@ class Board:
         for row in self.grid:
             display_row = []
             for cell in row:
-                if not cell.revealed:
+                if cell.flagged:
+                    value = "F"
+                elif not cell.revealed:
                     value = "."
                 elif cell.has_mine:
                     value = "*"
@@ -99,7 +101,9 @@ class Board:
         for row in self.grid:
             display_row = []
             for cell in row:
-                if cell.has_mine:
+                if cell.flagged:
+                    value = "F"
+                elif cell.has_mine:
                     value = "*"
                 elif cell.neighbor_mines == 0:
                     value = " "
@@ -146,6 +150,14 @@ class Board:
                     self.move_mine(row, col)
                     self.compute_numbers()
                 self.first_click = False
+            flagged = bool(int(input("Enter 1 to flag and 0 to not flag: ")))
+            if flagged:
+                if self.grid[row][col].revealed:
+                    continue
+                self.grid[row][col].flagged = True
+                continue
+
+            self.grid[row][col].flagged = False
             self.reveal(row, col)
             if self.check_win():
                 print("You win!")
