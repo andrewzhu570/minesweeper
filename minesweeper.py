@@ -59,7 +59,7 @@ class Board:
                 else: self.grid[r][c].neighbor_mines = 0
 
     def reveal(self, r, c):
-        """Reveals each cell that is clicked"""
+        """Reveals each cell that is clicked along with neighboring cells touching 0 mines"""
         if not (0 <= r < self.size and 0 <= c < self.size):
             return
         cell = self.grid[r][c]
@@ -81,6 +81,7 @@ class Board:
                 self.reveal(nr, nc)
 
     def display_board(self):
+        """Generates the visual of the entire board"""
         for row in self.grid:
             display_row = []
             for cell in row:
@@ -98,6 +99,7 @@ class Board:
             print("  ".join(display_row))
 
     def reveal_all(self):
+        """Reveals every cell"""
         for row in self.grid:
             display_row = []
             for cell in row:
@@ -120,6 +122,7 @@ class Board:
         return True
 
     def move_mine(self, r, c):
+        """Ensures first click safety by moving the mine a user clicks on the first move"""
         self.grid[r][c].has_mine = False
         found_space = False
         while not found_space:
@@ -136,29 +139,32 @@ class Board:
     def play_game(self):
         while not self.game_over:
             self.display_board()
+            command = input("Enter move: (r row col or f row col): ")
+            parts = command.split()
+            action = parts[0]
             try:
-                row = int(input("Row: "))
-                col = int(input("Column: "))
+                row = int(parts[1])
+                col = int(parts[2])
             except ValueError:
                 print("Invalid input!")
                 continue
             if not (0 <= row < self.size and 0 <= col < self.size):
                 print("Out of range")
                 continue
-            if self.first_click:
-                if self.grid[row][col].has_mine:
-                    self.move_mine(row, col)
-                    self.compute_numbers()
-                self.first_click = False
-            flagged = bool(int(input("Enter 1 to flag and 0 to not flag: ")))
-            if flagged:
+
+            if action == "r":
+                if self.first_click:
+                    if self.grid[row][col].has_mine:
+                        self.move_mine(row, col)
+                        self.compute_numbers()
+                    self.first_click = False
+                self.reveal(row, col)
+            elif action == "f":
                 if self.grid[row][col].revealed:
                     continue
-                self.grid[row][col].flagged = True
-                continue
-
-            self.grid[row][col].flagged = False
-            self.reveal(row, col)
+                self.grid[row][col].flagged = not self.grid[row][col].flagged
+            else:
+                print("Unknown command")
             if self.check_win():
                 print("You win!")
                 self.display_board()
