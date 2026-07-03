@@ -3,7 +3,7 @@ import tkinter as tk
 import minesweeper as mine
 class GUI:
     def __init__(self):
-        self.board = mine.Board(5, 24)
+        self.board = mine.Board(5, 5)
         self.window = tk.Tk()
         self.window.title("Minesweeper")
 
@@ -33,8 +33,24 @@ class GUI:
                 self.board.compute_numbers()
             self.board.first_click = False
         self.board.reveal(row, col)
-
         self.update_display()
+        if self.board.game_over:
+            self.reveal_all()
+
+    def reveal_all(self):
+        for r in range(self.board.size):
+            for c in range(self.board.size):
+                cell = self.board.grid[r][c]
+
+                if cell.flagged:
+                    text = "F"
+                elif cell.has_mine:
+                    text = "*"
+                elif cell.neighbor_mines == 0:
+                    text = ""
+                else:
+                    text = str(cell.neighbor_mines)
+                self.buttons[r][c].config(text=text)
 
     def update_display(self):
         for r in range(self.board.size):
