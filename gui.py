@@ -3,7 +3,7 @@ import tkinter as tk
 import minesweeper as mine
 class GUI:
     def __init__(self):
-        self.board = mine.Board(5, 5)
+        self.board = mine.Board(5, 2)
         self.window = tk.Tk()
         self.window.title("Minesweeper")
 
@@ -36,6 +36,8 @@ class GUI:
         self.update_display()
         if self.board.game_over:
             self.reveal_all()
+        elif self.board.check_win():
+            print("You win!")
 
     def reveal_all(self):
         for r in range(self.board.size):
