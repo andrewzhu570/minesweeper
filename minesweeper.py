@@ -172,5 +172,6 @@ class Board:
         self.reveal_all()
         print("Game Over!")
 
-board = Board(5, 5)
-board.play_game()
+if __name__ == "__main__":
+    board = Board(5, 5)
+    board.play_game()
