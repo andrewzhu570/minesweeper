@@ -18,7 +18,7 @@ class GUI:
                                    width=3,
                                    height=1,
                                    command=lambda r=r, c=c: self.click(r, c))
-
+                button.bind("<Button-2>", lambda event, r=r, c=c: self.flag(r, c))
                 button.grid(row=r, column=c)
 
                 row.append(button)
@@ -38,6 +38,13 @@ class GUI:
             self.reveal_all()
         elif self.board.check_win():
             print("You win!")
+
+    def flag(self, row, col):
+        cell = self.board.grid[row][col]
+        if cell.revealed:
+            return
+        cell.flagged = not cell.flagged
+        self.update_display()
 
     def reveal_all(self):
         for r in range(self.board.size):
