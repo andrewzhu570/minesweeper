@@ -2,6 +2,8 @@
 import tkinter as tk
 from tkinter import messagebox
 import minesweeper as mine
+import time
+
 class GUI:
     def __init__(self):
         self.BOARD_SIZE = 8
@@ -11,6 +13,9 @@ class GUI:
         self.window.title("Minesweeper")
         self.buttons = []
 
+        self.start_time = None
+        self.time_running = False
+
         self.mine_counter = tk.Label(
             self.window,
             text=f"Mines: {self.NUM_MINES}\n"
@@ -18,6 +23,13 @@ class GUI:
             font=("Arial", 12)
         )
         self.mine_counter.grid(row=0, column=0, columnspan=2)
+
+        self.time_label = tk.Label(
+            self.window,
+            text=f"Time: {0}",
+            font=("Arial", 12)
+        )
+        self.time_label.grid(row=0, column=0, columnspan = 10)
         self.restart_button = tk.Button(
             self.window,
             text="Restart",
@@ -46,17 +58,22 @@ class GUI:
             if self.board.grid[row][col].has_mine:
                 self.board.move_mine(row, col)
                 self.board.compute_numbers()
+            self.start_time = time.time()
+            self.time_running = True
             self.board.first_click = False
+            self.update_timer()
         self.board.reveal(row, col)
         self.update_display()
 
         if self.board.game_over:
+            self.time_running = False
             self.reveal_all()
             messagebox.showinfo("Game over.", "Better luck next time.")
             for row in self.buttons:
                 for button in row:
                     button.config(state="disabled")
         elif self.board.check_win():
+            self.time_running = False
             for row in self.buttons:
                 for button in row:
                     button.config(state="disabled")
@@ -76,6 +93,13 @@ class GUI:
         for row in self.buttons:
             for button in row:
                 button.config(state="normal")
+
+    def update_timer(self):
+        if not self.time_running:
+            return
+        elapsed = int(time.time() - self.start_time)
+        self.time_label.config(text=f"Time: {elapsed}")
+        self.window.after(1000, self.update_timer)
 
     def reveal_all(self):
         for r in range(self.board.size):
