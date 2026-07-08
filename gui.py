@@ -9,14 +9,21 @@ class GUI:
         self.board = mine.Board(self.BOARD_SIZE, self.NUM_MINES)
         self.window = tk.Tk()
         self.window.title("Minesweeper")
-
         self.buttons = []
+
+        self.mine_counter = tk.Label(
+            self.window,
+            text=f"Mines: {self.NUM_MINES}\n"
+                 f"Flags: {0}",
+            font=("Arial", 12)
+        )
+        self.mine_counter.grid(row=0, column=0, columnspan=2)
         self.restart_button = tk.Button(
             self.window,
             text="Restart",
             command=self.restart
         )
-        self.restart_button.grid(row=0, column=0, columnspan=self.board.size)
+        self.restart_button.grid(row=0, column=0, columnspan=5)
         for r in range(self.board.size):
             row = []
 
@@ -85,6 +92,14 @@ class GUI:
                     text = str(cell.neighbor_mines)
                 self.buttons[r][c].config(text=text)
 
+    def update_mine_counter(self):
+        flag_count = 0
+        for row in self.board.grid:
+            for cell in row:
+                if cell.flagged:
+                    flag_count += 1
+        self.mine_counter.config(text=f"Mines: {self.NUM_MINES}\n"
+                                      f"Flags: {flag_count}")
     def update_display(self):
         for r in range(self.board.size):
             for c in range(self.board.size):
@@ -114,8 +129,8 @@ class GUI:
                         self.buttons[r][c].config(
                             fg=colors[cell.neighbor_mines]
                         )
-
                 self.buttons[r][c].config(text=text)
 
+                self.update_mine_counter()
 gui = GUI()
 gui.window.mainloop()
