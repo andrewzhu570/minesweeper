@@ -7,7 +7,7 @@ import time
 class GUI:
     def __init__(self):
         self.BOARD_SIZE = 8
-        self.NUM_MINES = 5
+        self.NUM_MINES = 7
         self.board = mine.Board(self.BOARD_SIZE, self.NUM_MINES)
         self.window = tk.Tk()
         self.window.title("Minesweeper")
@@ -43,7 +43,7 @@ class GUI:
         )
         self.game_menu.add_command(
             label="Easy",
-            command=lambda: self.set_difficulty(8, 10)
+            command=lambda: self.set_difficulty(8, 7)
         )
         self.game_menu.add_command(
             label="Intermediate",
@@ -94,8 +94,19 @@ class GUI:
 
     def flag(self, row, col):
         cell = self.board.grid[row][col]
+
         if cell.revealed:
             return
+
+        flag_count = sum(
+            cell.flagged
+            for row in self.board.grid
+            for cell in row
+        )
+
+        if not cell.flagged and flag_count >= self.NUM_MINES:
+            return
+
         cell.flagged = not cell.flagged
         self.update_display()
 
@@ -108,6 +119,10 @@ class GUI:
         for row in self.buttons:
             for button in row:
                 button.config(state="normal")
+
+        self.start_time = None
+        self.time_running = False
+        self.time_label.config(text="Time: 0")
 
     def update_timer(self):
         if not self.time_running:
@@ -170,7 +185,7 @@ class GUI:
                         )
                 self.buttons[r][c].config(text=text)
 
-                self.update_mine_counter()
+        self.update_mine_counter()
 
     def set_difficulty(self, size, mines):
         self.BOARD_SIZE = size
@@ -200,5 +215,6 @@ class GUI:
                 button.destroy()
 
         self.buttons = []
+
 gui = GUI()
 gui.window.mainloop()
