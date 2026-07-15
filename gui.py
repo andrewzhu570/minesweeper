@@ -60,24 +60,32 @@ class GUI:
 
         self.window.config(menu=self.menu_bar)
 
-        self.time_label.grid(row=0, column=0, columnspan=10)
+        self.time_label.grid(row=0, column=0, columnspan=8)
         self.mine_counter.grid(row=0, column=0, columnspan=1)
-        self.difficulty_label.grid(row=0, column=0, columnspan = 6)
+        self.difficulty_label.grid(row=0, column=0, columnspan = 4)
         self.create_board_widgets()
         self.update_display()
 
     def click(self, row, col):
-        if self.board.grid[row][col].flagged:
+        cell = self.board.grid[row][col]
+        if cell.flagged:
             return
+
         if self.board.first_click:
-            if self.board.grid[row][col].has_mine:
+            if cell.has_mine:
                 self.board.move_mine(row, col)
                 self.board.compute_numbers()
             self.start_time = time.time()
             self.time_running = True
             self.board.first_click = False
             self.update_timer()
-        self.board.reveal(row, col)
+
+        if cell.revealed:
+            if self.get_adjacent_flags(row, col) == cell.neighbor_mines:
+                self.chord(row, col)
+        else:
+            self.board.reveal(row, col)
+
         self.update_display()
 
         if self.board.game_over:
@@ -165,6 +173,7 @@ class GUI:
                     flag_count += 1
         self.mine_counter.config(text=f"Mines: {self.NUM_MINES}\n"
                                       f"Flags: {flag_count}")
+
     def update_display(self):
         for r in range(self.board.size):
             for c in range(self.board.size):
@@ -239,6 +248,35 @@ class GUI:
                     fg=colors[cell.neighbor_mines]
                 )
         return text
+
+    def get_adjacent_flags(self, r, c):
+        directions = [(-1, -1), (-1, 0), (-1, 1),
+                      (0, -1), (0, 1),
+                      (1, -1), (1, 0), (1, 1)]
+        count = 0
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+
+            if 0 <= nr < self.board.size and 0 <= nc < self.board.size:
+                if self.board.grid[nr][nc].flagged:
+                    count += 1
+
+        return count
+
+    def chord(self, r, c):
+        directions = [(-1, -1), (-1, 0), (-1, 1),
+                      (0, -1), (0, 1),
+                      (1, -1), (1, 0), (1, 1)]
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+            if 0 <= nr < self.board.size and 0 <= nc < self.board.size:
+                new_cell = self.board.grid[nr][nc]
+                if not new_cell.revealed and not new_cell.flagged:
+                    self.board.reveal(nr, nc)
+                    if self.board.game_over:
+                        return
+
+
 
 gui = GUI()
 gui.window.mainloop()
