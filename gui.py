@@ -23,16 +23,16 @@ class GUI:
             font=("Arial", 12)
         )
 
+        self.difficulty_label = tk.Label(
+            self.window,
+            text=f"Easy",
+            font=("Arial", 12)
+        )
+
         self.time_label = tk.Label(
             self.window,
             text=f"Time: {0}",
             font=("Arial", 12)
-        )
-
-        self.restart_button = tk.Button(
-            self.window,
-            text="Restart",
-            command=self.restart
         )
 
         self.menu_bar = tk.Menu(self.window)
@@ -61,12 +61,14 @@ class GUI:
         self.window.config(menu=self.menu_bar)
 
         self.time_label.grid(row=0, column=0, columnspan=10)
-        self.mine_counter.grid(row=0, column=0, columnspan=2)
-        self.restart_button.grid(row=0, column=0, columnspan=5)
+        self.mine_counter.grid(row=0, column=0, columnspan=1)
+        self.difficulty_label.grid(row=0, column=0, columnspan = 6)
         self.create_board_widgets()
         self.update_display()
 
     def click(self, row, col):
+        if self.board.grid[row][col].flagged:
+            return
         if self.board.first_click:
             if self.board.grid[row][col].has_mine:
                 self.board.move_mine(row, col)
@@ -81,16 +83,25 @@ class GUI:
         if self.board.game_over:
             self.time_running = False
             self.reveal_all()
-            messagebox.showinfo("Game over.", "Better luck next time.")
+            self.window.after(
+                500,
+                lambda: messagebox.showinfo("Game over.", "Better luck next time.")
+            )
+
             for row in self.buttons:
                 for button in row:
                     button.config(state="disabled")
+
         elif self.board.check_win():
             self.time_running = False
             for row in self.buttons:
                 for button in row:
                     button.config(state="disabled")
-            messagebox.showinfo("You win!", "Congratulations!")
+            self.window.after(
+                500,
+                lambda: messagebox.showinfo("You win!", "Congratulations!")
+            )
+
 
     def flag(self, row, col):
         cell = self.board.grid[row][col]
@@ -137,9 +148,9 @@ class GUI:
                 cell = self.board.grid[r][c]
 
                 if cell.flagged:
-                    text = "F"
+                    text = "🚩"
                 elif cell.has_mine:
-                    text = "*"
+                    text = "💥"
                 elif cell.neighbor_mines == 0:
                     text = ""
                 else:
@@ -157,32 +168,7 @@ class GUI:
     def update_display(self):
         for r in range(self.board.size):
             for c in range(self.board.size):
-                cell = self.board.grid[r][c]
-
-                if cell.flagged:
-                    text = "F"
-                elif not cell.revealed:
-                    text = "."
-                elif cell.has_mine:
-                    text = "*"
-                elif cell.neighbor_mines == 0:
-                    text = ""
-                else:
-                    colors = {
-                        1: "blue",
-                        2: "green",
-                        3: "red",
-                        4: "#000080",
-                        5: "brown",
-                        6: "#008080",
-                        7: "black",
-                        8: "gray"
-                    }
-                    text = cell.neighbor_mines
-                    if cell.neighbor_mines > 0:
-                        self.buttons[r][c].config(
-                            fg=colors[cell.neighbor_mines]
-                        )
+                text = self.get_cell_text(r, c)
                 self.buttons[r][c].config(text=text)
 
         self.update_mine_counter()
@@ -191,6 +177,12 @@ class GUI:
         self.BOARD_SIZE = size
         self.NUM_MINES = mines
         self.restart()
+        if mines == 7:
+            self.difficulty_label.config(text="Easy")
+        elif mines == 25:
+            self.difficulty_label.config(text="Intermediate")
+        else:
+            self.difficulty_label.config(text="Advanced")
 
     def create_board_widgets(self):
         for r in range(self.board.size):
@@ -199,10 +191,11 @@ class GUI:
             for c in range(self.board.size):
                 button = tk.Button(self.window,
                                    text=".",
-                                   width=3,
+                                   width=1,
                                    height=1,
                                    command=lambda r=r, c=c: self.click(r, c))
                 button.bind("<Button-2>", lambda event, r=r, c=c: self.flag(r, c))
+                button.bind("<Button-3>", lambda event, r=r, c=c: self.flag(r, c))
                 button.grid(row=r+1, column=c)
 
                 row.append(button)
@@ -215,6 +208,37 @@ class GUI:
                 button.destroy()
 
         self.buttons = []
+
+    def get_cell_text(self, r, c):
+        cell = self.board.grid[r][c]
+        if cell.flagged:
+            text = "🚩"
+        elif not cell.revealed:
+            text = ""
+        elif cell.has_mine:
+            text = "💥"
+        elif cell.neighbor_mines == 0:
+            text = ""
+            self.buttons[r][c].config(
+                state="disabled"
+            )
+        else:
+            colors = {
+                1: "blue",
+                2: "green",
+                3: "red",
+                4: "#000080",
+                5: "brown",
+                6: "#008080",
+                7: "black",
+                8: "gray"
+            }
+            text = cell.neighbor_mines
+            if cell.neighbor_mines > 0:
+                self.buttons[r][c].config(
+                    fg=colors[cell.neighbor_mines]
+                )
+        return text
 
 gui = GUI()
 gui.window.mainloop()
