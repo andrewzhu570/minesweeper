@@ -2,12 +2,14 @@ import tkinter as tk
 from tkinter import messagebox
 import minesweeper as mine
 import time
+import solver
 
 class GUI:
     def __init__(self):
         self.BOARD_SIZE = 8
         self.NUM_MINES = 7
         self.board = mine.Board(self.BOARD_SIZE, self.NUM_MINES)
+        self.solver = solver.Solver(self.board)
         self.window = tk.Tk()
         self.window.title("Minesweeper")
         self.buttons = []
@@ -15,23 +17,44 @@ class GUI:
         self.start_time = None
         self.time_running = False
 
+        self.top_frame = tk.Frame(self.window)
+        self.top_frame.grid(row=0, column=0, columnspan=self.BOARD_SIZE, sticky="ew")
+
         self.mine_counter = tk.Label(
-            self.window,
+            self.top_frame,
             text=f"Mines: {self.NUM_MINES}\n"
                  f"Flags: {0}",
             font=("Arial", 12)
         )
 
         self.difficulty_label = tk.Label(
-            self.window,
+            self.top_frame,
             text=f"Easy",
             font=("Arial", 12)
         )
 
         self.time_label = tk.Label(
-            self.window,
+            self.top_frame,
             text=f"Time: {0}",
             font=("Arial", 12)
+        )
+
+        self.auto_flag_button = tk.Button(
+            self.top_frame,
+            text="Flag All",
+            command=self.auto_flag
+        )
+
+        self.auto_reveal_button = tk.Button(
+            self.top_frame,
+            text="Reveal All",
+            command=self.auto_reveal
+        )
+
+        self.solve_step_button = tk.Button(
+            self.top_frame,
+            text="Solve Step",
+            command=self.solve_step
         )
 
         self.menu_bar = tk.Menu(self.window)
@@ -59,9 +82,15 @@ class GUI:
 
         self.window.config(menu=self.menu_bar)
 
-        self.time_label.grid(row=0, column=0, columnspan=8)
-        self.mine_counter.grid(row=0, column=0, columnspan=1)
-        self.difficulty_label.grid(row=0, column=0, columnspan = 4)
+
+
+        self.mine_counter.grid(in_=self.top_frame, row=0, column=0, padx=5)
+        self.difficulty_label.grid(in_=self.top_frame, row=0, column=1, padx=5)
+        self.time_label.grid(in_=self.top_frame, row=0, column=2, padx=5)
+        self.auto_flag_button.grid(in_=self.top_frame, row=0, column=3, padx=5)
+        self.auto_reveal_button.grid(in_=self.top_frame, row=0, column=4, padx=5)
+        self.solve_step_button.grid(in_=self.top_frame, row=0, column=5, padx=5)
+
         self.create_board_widgets()
         self.update_display()
 
@@ -131,6 +160,7 @@ class GUI:
     def restart(self):
         self.destroy_board_widgets()
         self.board = mine.Board(self.BOARD_SIZE, self.NUM_MINES)
+        self.solver = solver.Solver(self.board)
         self.create_board_widgets()
         self.update_display()
 
@@ -275,6 +305,23 @@ class GUI:
                     if self.board.game_over:
                         return
 
+    def auto_flag(self):
+        mine_moves = self.solver.find_mines()
+        for r, c in mine_moves:
+            self.board.grid[r][c].flagged = True
+
+        self.update_display()
+
+    def auto_reveal(self):
+        safe_moves = self.solver.find_safe_moves()
+        for r, c in safe_moves:
+            self.board.grid[r][c].revealed = True
+        self.update_display()
+
+    def solve_step(self):
+        self.auto_flag()
+        self.auto_reveal()
+        self.update_display()
 
 
 gui = GUI()
