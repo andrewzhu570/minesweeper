@@ -1,4 +1,3 @@
-# Andrew Zhu kuh4de
 import tkinter as tk
 from tkinter import messagebox
 import minesweeper as mine

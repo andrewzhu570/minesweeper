@@ -1,4 +1,3 @@
-# Andrew Zhu kuh4de
 import random
 
 class Cell:
