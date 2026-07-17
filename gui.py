@@ -129,15 +129,17 @@ class GUI:
                     button.config(state="disabled")
 
         elif self.board.check_win():
-            self.time_running = False
-            for row in self.buttons:
-                for button in row:
-                    button.config(state="disabled")
-            self.window.after(
-                500,
-                lambda: messagebox.showinfo("You win!", "Congratulations!")
-            )
+            self.game_won()
 
+    def game_won(self):
+        self.time_running = False
+        for row in self.buttons:
+            for button in row:
+                button.config(state="disabled")
+        self.window.after(
+            500,
+            lambda: messagebox.showinfo("You win!", "Congratulations!")
+        )
 
     def flag(self, row, col):
         cell = self.board.grid[row][col]
@@ -322,6 +324,8 @@ class GUI:
         self.auto_flag()
         self.auto_reveal()
         self.update_display()
+        if self.board.check_win():
+            self.game_won()
 
 
 gui = GUI()
