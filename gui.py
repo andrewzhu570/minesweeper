@@ -39,22 +39,16 @@ class GUI:
             font=("Arial", 12)
         )
 
-        self.auto_flag_button = tk.Button(
-            self.top_frame,
-            text="Flag All",
-            command=self.auto_flag
-        )
-
-        self.auto_reveal_button = tk.Button(
-            self.top_frame,
-            text="Reveal All",
-            command=self.auto_reveal
-        )
-
         self.solve_step_button = tk.Button(
             self.top_frame,
             text="Solve Step",
             command=self.solve_step
+        )
+
+        self.solve_all_button = tk.Button(
+            self.top_frame,
+            text="Solve All",
+            command=self.solve_all
         )
 
         self.menu_bar = tk.Menu(self.window)
@@ -87,9 +81,8 @@ class GUI:
         self.mine_counter.grid(in_=self.top_frame, row=0, column=0, padx=5)
         self.difficulty_label.grid(in_=self.top_frame, row=0, column=1, padx=5)
         self.time_label.grid(in_=self.top_frame, row=0, column=2, padx=5)
-        self.auto_flag_button.grid(in_=self.top_frame, row=0, column=3, padx=5)
-        self.auto_reveal_button.grid(in_=self.top_frame, row=0, column=4, padx=5)
-        self.solve_step_button.grid(in_=self.top_frame, row=0, column=5, padx=5)
+        self.solve_step_button.grid(in_=self.top_frame, row=0, column=3, padx=5)
+        self.solve_all_button.grid(row=0, column=4, padx=5)
 
         self.create_board_widgets()
         self.update_display()
@@ -308,24 +301,44 @@ class GUI:
                         return
 
     def auto_flag(self):
+        flags_added = 0
         mine_moves = self.solver.find_mines()
         for r, c in mine_moves:
             self.board.grid[r][c].flagged = True
+            flags_added += 1
 
-        self.update_display()
+        return flags_added > 0
 
     def auto_reveal(self):
+        cells_revealed = 0
         safe_moves = self.solver.find_safe_moves()
         for r, c in safe_moves:
             self.board.grid[r][c].revealed = True
-        self.update_display()
+            cells_revealed += 1
+
+        return cells_revealed > 0
 
     def solve_step(self):
-        self.auto_flag()
-        self.auto_reveal()
+        changed = False
+        if self.auto_flag():
+            changed = True
+        if self.auto_reveal():
+            changed = True
         self.update_display()
         if self.board.check_win():
             self.game_won()
+        return changed
+
+    def solve_all(self):
+        if self.board.check_win():
+            self.game_won()
+            return
+        progress = self.solve_step()
+        if not progress:
+            return
+        else:
+            self.window.after(500, self.solve_all)
+
 
 
 gui = GUI()

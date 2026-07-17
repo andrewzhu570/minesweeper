@@ -63,7 +63,7 @@ class Solver:
                         nr, nc = r + dr, c + dc
 
                         if 0 <= nr < self.size and 0 <= nc < self.size:
-                            if not self.board.grid[nr][nc].revealed:
+                            if not self.board.grid[nr][nc].revealed and not self.board.grid[nr][nc].flagged:
                                 mines.add((nr, nc))
         return mines
 
