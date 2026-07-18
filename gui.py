@@ -318,12 +318,37 @@ class GUI:
 
         return cells_revealed > 0
 
+    def auto_subset_solve(self):
+        changed = False
+
+        safe_moves, mine_moves = self.solver.find_subset_moves()
+
+        for r, c in mine_moves:
+            if not self.board.grid[r][c].flagged:
+                self.board.grid[r][c].flagged = True
+                changed = True
+
+        for r, c in safe_moves:
+            if not self.board.grid[r][c].revealed:
+                self.board.grid[r][c].revealed = True
+                changed = True
+
+        return changed
+
+
     def solve_step(self):
         changed = False
+
         if self.auto_flag():
             changed = True
+
         if self.auto_reveal():
             changed = True
+
+        if not changed:
+            if self.auto_subset_solve():
+                changed = True
+
         self.update_display()
         if self.board.check_win():
             self.game_won()
