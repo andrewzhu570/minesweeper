@@ -17,9 +17,14 @@ class GUI:
         self.start_time = None
         self.time_running = False
 
-        self.top_frame = tk.Frame(self.window)
+        self.top_frame = tk.Frame(self.window,bg="#333333", padx=10, pady=10)
         self.top_frame.grid(row=0, column=0, columnspan=self.BOARD_SIZE, sticky="ew")
 
+        self.status_label = tk.Label(
+            self.top_frame,
+            text="👋",
+            font=("Arial", 20)
+        )
         self.mine_counter = tk.Label(
             self.top_frame,
             text=f"Mines: {self.NUM_MINES}\n"
@@ -77,12 +82,12 @@ class GUI:
         self.window.config(menu=self.menu_bar)
 
 
-
-        self.mine_counter.grid(in_=self.top_frame, row=0, column=0, padx=5)
-        self.difficulty_label.grid(in_=self.top_frame, row=0, column=1, padx=5)
-        self.time_label.grid(in_=self.top_frame, row=0, column=2, padx=5)
-        self.solve_step_button.grid(in_=self.top_frame, row=0, column=3, padx=5)
-        self.solve_all_button.grid(row=0, column=4, padx=5)
+        self.status_label.grid(row=0, column=5)
+        self.mine_counter.grid(in_=self.top_frame, row=0, column=0, padx=3)
+        self.difficulty_label.grid(in_=self.top_frame, row=0, column=1, padx=3)
+        self.time_label.grid(in_=self.top_frame, row=0, column=2, padx=3)
+        self.solve_step_button.grid(in_=self.top_frame, row=0, column=3, padx=3)
+        self.solve_all_button.grid(row=0, column=4, padx=3)
 
         self.create_board_widgets()
         self.update_display()
@@ -114,7 +119,11 @@ class GUI:
             self.reveal_all()
             self.window.after(
                 500,
-                lambda: messagebox.showinfo("Game over.", "Better luck next time.")
+                lambda: (
+                    self.solve_step_button.grid_remove(),
+                    self.solve_all_button.grid_remove(),
+                    self.status_label.config(text="YOU LOST! 😵")
+                )
             )
 
             for row in self.buttons:
@@ -131,7 +140,11 @@ class GUI:
                 button.config(state="disabled")
         self.window.after(
             500,
-            lambda: messagebox.showinfo("You win!", "Congratulations!")
+            lambda: (
+                self.solve_step_button.grid_remove(),
+                self.solve_all_button.grid_remove(),
+                self.status_label.config(text="WINNER! 😎"),
+            )
         )
 
     def flag(self, row, col):
@@ -158,6 +171,9 @@ class GUI:
         self.solver = solver.Solver(self.board)
         self.create_board_widgets()
         self.update_display()
+        self.status_label.config(text="👋")
+        self.solve_step_button.grid()
+        self.solve_all_button.grid()
 
         for row in self.buttons:
             for button in row:
@@ -223,9 +239,10 @@ class GUI:
 
             for c in range(self.board.size):
                 button = tk.Button(self.window,
-                                   text=".",
+                                   text="",
                                    width=1,
                                    height=1,
+                                   font=("Arial", 12, "bold"),
                                    command=lambda r=r, c=c: self.click(r, c))
                 button.bind("<Button-2>", lambda event, r=r, c=c: self.flag(r, c))
                 button.bind("<Button-3>", lambda event, r=r, c=c: self.flag(r, c))
@@ -313,7 +330,7 @@ class GUI:
         cells_revealed = 0
         safe_moves = self.solver.find_safe_moves()
         for r, c in safe_moves:
-            self.board.grid[r][c].revealed = True
+            self.board.reveal(r, c)
             cells_revealed += 1
 
         return cells_revealed > 0
@@ -330,7 +347,7 @@ class GUI:
 
         for r, c in safe_moves:
             if not self.board.grid[r][c].revealed:
-                self.board.grid[r][c].revealed = True
+                self.board.reveal(r, c)
                 changed = True
 
         return changed
@@ -355,9 +372,6 @@ class GUI:
         return changed
 
     def solve_all(self):
-        if self.board.check_win():
-            self.game_won()
-            return
         progress = self.solve_step()
         if not progress:
             return
@@ -366,5 +380,3 @@ class GUI:
 
 
 
-gui = GUI()
-gui.window.mainloop()
