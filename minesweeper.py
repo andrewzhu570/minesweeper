@@ -136,6 +136,7 @@ class Board:
                 found_space = True
 
     def play_game(self):
+        """Used only for functionality of the terminal version"""
         while not self.game_over:
             self.display_board()
             command = input("Enter move: (r row col or f row col): ")
