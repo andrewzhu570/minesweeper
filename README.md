@@ -1,5 +1,11 @@
 # 💣 Minesweeper with Custom Automated Solver
 
+
+
+<img width="711" height="443" alt="Screenshot 2026-07-20 at 6 37 29 PM" src="https://github.com/user-attachments/assets/6b994c9f-0c15-4bee-a17a-ff42f5d2ae79" />
+
+
+
 A full-featured desktop Minesweeper application built from scratch in Python, featuring dynamic board chording, multiple difficulty levels, and an automated solver engine that uses set-based inference logic.
 
 ---
@@ -39,4 +45,4 @@ python3 main.py
 
 
 
-<img width="711" height="443" alt="Screenshot 2026-07-20 at 6 37 29 PM" src="https://github.com/user-attachments/assets/6b994c9f-0c15-4bee-a17a-ff42f5d2ae79" />
+
