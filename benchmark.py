@@ -1,5 +1,6 @@
 import minesweeper as mine
 import solver
+import random
 
 def benchmark(size, mines, total_games=100):
     print(f"Starting benchmark for a board of size {size} and {mines} mines over {total_games} games.")
@@ -79,7 +80,17 @@ def benchmark(size, mines, total_games=100):
                         changed = True
 
             if not changed:
-                break
+                unrevealed_cells = []
+                for r in range(board.size):
+                    for c in range(board.size):
+                        if not board.grid[r][c].revealed and not board.grid[r][c].flagged:
+                            unrevealed_cells.append([r, c])
+
+                if unrevealed_cells:
+                    gr, gc = random.choice(unrevealed_cells)
+                    board.reveal(gr,gc)
+                else:
+                    break
 
     win_rate = (wins / total_games) * 100
     print(win_rate)
