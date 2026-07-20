@@ -19,6 +19,7 @@ class GUI:
         self.top_frame = tk.Frame(self.window,bg="#333333", padx=10, pady=10)
         self.top_frame.grid(row=0, column=0, columnspan=self.BOARD_SIZE, sticky="ew")
 
+        # Label and button creations
         self.status_label = tk.Label(
             self.top_frame,
             text="👋",
@@ -30,31 +31,28 @@ class GUI:
                  f"Flags: {0}",
             font=("Arial", 12)
         )
-
         self.difficulty_label = tk.Label(
             self.top_frame,
             text=f"Easy",
             font=("Arial", 12)
         )
-
         self.time_label = tk.Label(
             self.top_frame,
             text=f"Time: {0}",
             font=("Arial", 12)
         )
-
         self.solve_step_button = tk.Button(
             self.top_frame,
             text="Solve Step",
             command=self.solve_step
         )
-
         self.solve_all_button = tk.Button(
             self.top_frame,
             text="Solve All",
             command=self.solve_all
         )
 
+        # Setup Menus
         self.menu_bar = tk.Menu(self.window)
         self.game_menu = tk.Menu(self.menu_bar)
         self.game_menu.add_command(
@@ -77,10 +75,9 @@ class GUI:
             label="Game",
             menu=self.game_menu
         )
-
         self.window.config(menu=self.menu_bar)
 
-
+        # Layout for top panel
         self.status_label.grid(row=0, column=5)
         self.mine_counter.grid(in_=self.top_frame, row=0, column=0, padx=3)
         self.difficulty_label.grid(in_=self.top_frame, row=0, column=1, padx=3)
@@ -350,7 +347,6 @@ class GUI:
                 changed = True
 
         return changed
-
 
     def solve_step(self):
         changed = False

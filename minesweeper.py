@@ -80,7 +80,7 @@ class Board:
                 self.reveal(nr, nc)
 
     def display_board(self):
-        """Generates the visual of the entire board"""
+        """Generates the visual of the entire board ONLY FOR TERMINAL VERSION"""
         for row in self.grid:
             display_row = []
             for cell in row:
@@ -98,7 +98,7 @@ class Board:
             print("  ".join(display_row))
 
     def reveal_all(self):
-        """Reveals every cell"""
+        """Reveals every cell ONLY FOR TERMINAL VERSION"""
         for row in self.grid:
             display_row = []
             for cell in row:

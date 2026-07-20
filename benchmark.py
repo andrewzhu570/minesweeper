@@ -95,6 +95,6 @@ def benchmark(size, mines, total_games=100):
     win_rate = (wins / total_games) * 100
     print(win_rate)
 
-benchmark(8, 7, 100)
+benchmark(20, 60, 100)
 
 """Easy: size = 8, mines = 7 | Intermediate: size = 14, mines = 25 | Advanced: size = 20, mines = 60"""

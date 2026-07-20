@@ -94,7 +94,7 @@ class Solver:
                         if not self.board.grid[nr][nc].revealed:
                             continue
 
-                        hidden2, mines2 = self.get_cell_info(r, c)
+                        hidden2, mines2 = self.get_cell_info(nr, nc)
                         if not hidden2:
                             continue
 
@@ -111,16 +111,6 @@ class Solver:
                                     mine_moves.add(each)
 
         return safe_moves, mine_moves
-
-
-
-
-    def find_moves(self):
-
-        safe = self.find_safe_moves
-        mines = self.find_mines
-
-        return safe, mines
 
 
 
