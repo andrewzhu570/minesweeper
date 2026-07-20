@@ -4,20 +4,45 @@ import solver
 def benchmark(size, mines, total_games=100):
     print(f"Starting benchmark for a board of size {size} and {mines} mines over {total_games} games.")
     wins = 0
+    directions = [(-1, -1), (-1, 0), (-1, 1),
+                  (0, -1), (0, 1),
+                  (1, -1), (1, 0), (1, 1)]
 
     for game in range(1, total_games + 1):
         board = mine.Board(size, mines)
         solve = solver.Solver(board)
 
-        """Starts the game by revealing a 0 so the algorithms do not get stuck on a single revealed cell."""
+        """Starts the game by revealing a 0 that boarders at least one other 0 so the algorithms do not get stuck on a single revealed cell."""
+        found_optimal_move = False
+
         for r in range(board.size):
             for c in range(board.size):
                 if board.grid[r][c].neighbor_mines == 0 and not board.grid[r][c].has_mine:
-                    board.reveal(r, c)
-                    break
-            else:
-                continue
-            break
+                    borders_zero = False
+                    for dr, dc in directions:
+                        nr, nc = r + dr, c + dc
+                        if 0 <= nr < board.size and 0 <= nc < board.size:
+                            if board.grid[nr][nc].neighbor_mines == 0:
+                                borders_zero = True
+                                break
+
+                    if borders_zero:
+                        board.reveal(r, c)
+                        found_optimal_move = True
+                        break
+            if found_optimal_move:
+                break
+
+        if not found_optimal_move:
+            fallback_r, fallback_c = board.size // 2, board.size // 2
+
+            # Check to make sure the fallback click is mine-safe
+            if board.grid[fallback_r][fallback_c].has_mine:
+                board.move_mine(fallback_r, fallback_c)
+                board.compute_numbers()
+
+            board.reveal(fallback_r, fallback_c)
+
         board.first_click = False
 
         while not board.game_over:
@@ -59,4 +84,4 @@ def benchmark(size, mines, total_games=100):
     win_rate = (wins / total_games) * 100
     print(win_rate)
 
-benchmark(8, 7, 100)
+benchmark(8, 7, 1000)
