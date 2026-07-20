@@ -1,5 +1,4 @@
 import tkinter as tk
-from tkinter import messagebox
 import minesweeper as mine
 import time
 import solver
