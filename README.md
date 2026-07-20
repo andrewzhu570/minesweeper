@@ -35,3 +35,8 @@ Ensure you have **Python 3** installed, then clone the repository and run `main.
 git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
 cd your-repo-name
 python3 main.py
+```
+
+
+
+<img width="711" height="443" alt="Screenshot 2026-07-20 at 6 37 29 PM" src="https://github.com/user-attachments/assets/6b994c9f-0c15-4bee-a17a-ff42f5d2ae79" />
