@@ -14,36 +14,43 @@ def benchmark(size, mines, total_games=100):
         solve = solver.Solver(board)
 
         """Starts the game by revealing a 0 that boarders at least one other 0 so the algorithms do not get stuck on a single revealed cell."""
-        found_optimal_move = False
+        # found_optimal_move = False
+        #
+        # for r in range(board.size):
+        #     for c in range(board.size):
+        #         if board.grid[r][c].neighbor_mines == 0 and not board.grid[r][c].has_mine:
+        #             borders_zero = False
+        #             for dr, dc in directions:
+        #                 nr, nc = r + dr, c + dc
+        #                 if 0 <= nr < board.size and 0 <= nc < board.size:
+        #                     if board.grid[nr][nc].neighbor_mines == 0:
+        #                         borders_zero = True
+        #                         break
+        #
+        #             if borders_zero:
+        #                 board.reveal(r, c)
+        #                 found_optimal_move = True
+        #                 break
+        #     if found_optimal_move:
+        #         break
+        #
+        # if not found_optimal_move:
+        #     fallback_r, fallback_c = board.size // 2, board.size // 2
+        #
+        #     # Check to make sure the fallback click is mine-safe
+        #     if board.grid[fallback_r][fallback_c].has_mine:
+        #         board.move_mine(fallback_r, fallback_c)
+        #         board.compute_numbers()
+        #
+        #     board.reveal(fallback_r, fallback_c)
+        #
+        # board.first_click = False
 
-        for r in range(board.size):
-            for c in range(board.size):
-                if board.grid[r][c].neighbor_mines == 0 and not board.grid[r][c].has_mine:
-                    borders_zero = False
-                    for dr, dc in directions:
-                        nr, nc = r + dr, c + dc
-                        if 0 <= nr < board.size and 0 <= nc < board.size:
-                            if board.grid[nr][nc].neighbor_mines == 0:
-                                borders_zero = True
-                                break
-
-                    if borders_zero:
-                        board.reveal(r, c)
-                        found_optimal_move = True
-                        break
-            if found_optimal_move:
-                break
-
-        if not found_optimal_move:
-            fallback_r, fallback_c = board.size // 2, board.size // 2
-
-            # Check to make sure the fallback click is mine-safe
-            if board.grid[fallback_r][fallback_c].has_mine:
-                board.move_mine(fallback_r, fallback_c)
-                board.compute_numbers()
-
-            board.reveal(fallback_r, fallback_c)
-
+        """Updated the first move to simply revealing the center cell because the guessing mechanism was implemented."""
+        if board.grid[size//2][size//2].has_mine:
+            board.move_mine(size//2, size//2)
+            board.compute_numbers()
+        board.reveal(size//2, size//2)
         board.first_click = False
 
         while not board.game_over:
@@ -95,6 +102,6 @@ def benchmark(size, mines, total_games=100):
     win_rate = (wins / total_games) * 100
     print(win_rate)
 
-# benchmark(20, 60, 100)
+# benchmark(14, 25, 100)
 
 """Easy: size = 8, mines = 7 | Intermediate: size = 14, mines = 25 | Advanced: size = 20, mines = 60"""
