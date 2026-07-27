@@ -8,12 +8,12 @@ app = Flask(__name__)
 CORS(app)
 
 board: Board | None = None
-solver = None
+solver: Solver | None = None
 
 current_size = 8
 current_mines = 7
 
-@app.route('api/new-game', methods=["POST"])
+@app.route('/api/new-game', methods=["POST"])
 def new_game():
     global board, solver, current_size, current_mines
     data = request.get_json() or {}
@@ -62,7 +62,6 @@ def click():
         board.first_click = False
 
     if cell.revealed:
-        # Chording: if flagged neighbors match neighbor count, reveal hidden neighbors
         flag_count = len(solver.get_flagged_neighbors(r, c))
         if flag_count == cell.neighbor_mines:
             for dr, dc in solver.directions:
@@ -74,6 +73,47 @@ def click():
         board.reveal(r, c)
 
     return jsonify({
+        "grid": board.get_board_state(),
+        "game_over": board.game_over,
+        "win": board.check_win()
+    })
+
+@app.route('/api/flag', methods=['POST'])
+def flag():
+    global board
+
+    if board is None:
+        return jsonify({"error": "No active game. Start a new game first."}), 400
+
+    data = request.get_json() or {}
+    r = data.get('row')
+    c = data.get('col')
+
+    if r is None or c is None or not (0 <= r < board.size and 0 <= c < board.size):
+        return jsonify({"error": "Invalid coordinates"}), 400
+
+    cell = board.grid[r][c]
+
+    if not cell.revealed and not board.game_over:
+        cell.flagged = not cell.flagged
+
+    return jsonify({
+        "grid": board.get_board_state(),
+        "game_over": board.game_over,
+        "win": board.check_win()
+    })
+
+@app.route('/api/solve-step', methods=['POST'])
+def solve_step():
+    global board, solver
+
+    if board is None or solver is None:
+        return jsonify({"error": "No active game. Start a new game first."}), 400
+
+    changed = solver.step()
+
+    return jsonify({
+        "status": "moved" if changed else "stuck",
         "grid": board.get_board_state(),
         "game_over": board.game_over,
         "win": board.check_win()
