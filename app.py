@@ -110,7 +110,15 @@ def solve_step():
     if board is None or solver is None:
         return jsonify({"error": "No active game. Start a new game first."}), 400
 
-    changed = solver.step()
+    if board.game_over or board.check_win():
+        return jsonify({
+            "status": "game_ended",
+            "grid": board.get_board_state(),
+            "game_over": board.game_over,
+            "win": board.check_win()
+        })
+
+    changed = solver.solve_step()
 
     return jsonify({
         "status": "moved" if changed else "stuck",
@@ -118,3 +126,6 @@ def solve_step():
         "game_over": board.game_over,
         "win": board.check_win()
     })
+
+if __name__ == '__main__':
+    app.run(debug=True, port=5000)
