@@ -172,6 +172,24 @@ class Board:
         self.reveal_all()
         print("Game Over!")
 
+        def get_board_state(self):
+            """Converts internal Cell objects into a 2D list of strings/numbers for JSON transmission."""
+            state = []
+            for r in range(self.size):
+                row_data = []
+                for c in range(self.size):
+                    cell = self.grid[r][c]
+                    if cell.flagged:
+                        row_data.append("F")
+                    elif not cell.revealed:
+                        row_data.append("H")
+                    elif cell.has_mine:
+                        row_data.append("M")
+                    else:
+                        row_data.append(cell.neighbor_mines)
+                state.append(row_data)
+            return state
+
 if __name__ == "__main__":
     board = Board(5, 5)
     board.play_game()
