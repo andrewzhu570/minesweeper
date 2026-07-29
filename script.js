@@ -92,4 +92,35 @@ async function handleCellFlag(r, c) {
     }
 }
 
+async function stepSolve() {
+    try{
+        const res = await fetch(`${API_URL}/solve-step`, { method: 'POST'});
+        const data = await res.json();
+        renderBoard(data)
 
+        if (data.status === 'stuck' && !data.game_over && !data.win) {
+            document.getElementById('status').innerText = "Solver is stuck! Make a guess.";
+        }
+        return data;
+    } catch (err) {
+        console.log("Failed to run solve step", err);
+    }
+}
+
+async function toggleAutoSolve() {
+    isAutoSolving = !isAutoSolving;
+    const btn = document.getElementById('auto-btn');
+    btn.innerText = isAutoSolving ? "Pause" : "Auto Solve";
+
+    while (isAutoSolving) {
+        const data = await stepSolve();
+
+        if (!data || data.game_over || data.win || data.status === 'stuck') {
+            isAutoSolving = false;
+            btn.innerText = "Auto Solve";
+            break;
+        }
+
+        await new Promise(res => setTimeout(res, 250));
+    }
+}
