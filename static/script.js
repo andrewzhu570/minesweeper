@@ -35,8 +35,27 @@ function renderBoard(data) {
     const boardDiv = document.getElementById('board');
     const statusDiv = document.getElementById('status');
 
-    boardDiv.style.gridTemplateColumns = `repeat(${data.grid.length}, 40px)`;
+    const autoSolveBtn = document.getElementById('auto-btn');
+    const solveStepBtn = document.getElementById('solve-btn')
+
+    const isGameOver = data.game_over || data.win;
+
+
+    const cols = data.grid[0] ? data.grid[0].length : data.grid.length;
+    boardDiv.style.gridTemplateColumns = `repeat(${cols}, 40px)`;
     boardDiv.innerHTML = '';
+
+    if (isGameOver) {
+        boardDiv.style.pointerEvents = 'none';
+        boardDiv.style.opacity = '0.85';
+        if (autoSolveBtn) autoSolveBtn.disabled = true;
+        if (solveStepBtn) solveStepBtn.disabled = true;
+    } else {
+        boardDiv.style.pointerEvents = 'auto';
+        boardDiv.style.opacity = '1';
+        if (autoSolveBtn) autoSolveBtn.disabled = false;
+        if (solveStepBtn) solveStepBtn.disabled = false;
+    }
 
     data.grid.forEach((row, r) => {
         row.forEach((cell, c) => {
@@ -50,7 +69,6 @@ function renderBoard(data) {
                 } else if (cell.neighbor_mines > 0) {
                     cellDiv.innerText = cell.neighbor_mines;
                 }
-
             } else if (cell.flagged) {
                 cellDiv.classList.add('flagged');
                 cellDiv.innerText = '🚩';
@@ -73,7 +91,6 @@ function renderBoard(data) {
     } else {
         statusDiv.innerText = "";
     }
-
 }
 
 async function handleCellClick(r, c) {
