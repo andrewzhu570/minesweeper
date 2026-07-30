@@ -3,15 +3,26 @@ let isAutoSolving = false;
 
 window.onload = startNewGame;
 
+const DIFFICULTIES = {
+    easy: { size: 8, mines: 7 },
+    medium: { size: 10, mines: 15 },
+    hard: { size: 16, mines: 40 }
+};
+
+document.getElementById('difficulty').addEventListener('change', startNewGame);
+
 async function startNewGame() {
     isAutoSolving = false;
     document.getElementById('auto-btn').innerText = "Auto Solve";
+
+    const selectedDiff = document.getElementById('difficulty').value;
+    const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
 
     try {
         const response = await fetch(`${API_URL}/new-game`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ size: 8, mines: 7 })
+            body: JSON.stringify({ size: config.size, mines: config.mines})
         });
         const data = await response.json();
         renderBoard(data);

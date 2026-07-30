@@ -16,6 +16,15 @@
         <button id="auto-btn" onclick="toggleAutoSolve()">Auto Solve</button>
     </div>
 
+    <div class="controls">
+    <select id="difficulty">
+        <option value="easy">Easy (8x8, 7 Mines)</option>
+        <option value="medium" selected>Medium (10x10, 15 Mines)</option>
+        <option value="hard">Hard (16x16, 40 Mines)</option>
+    </select>
+
+    </div>
+
     <div id="board" class="board"></div>
     <div id="status"></div>
     <script src="script.js"></script>
