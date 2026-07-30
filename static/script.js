@@ -1,4 +1,4 @@
-const API_URL = "http://127.0.0.1:5000/api";
+const API_URL = "/api";
 let isAutoSolving = false;
 
 window.onload = startNewGame;
@@ -39,6 +39,7 @@ function renderBoard(data) {
                 } else if (cell.neighbor_mines > 0) {
                     cellDiv.innerText = cell.neighbor_mines;
                 }
+
             } else if (cell.flagged) {
                 cellDiv.classList.add('flagged');
                 cellDiv.innerText = '🚩';
