@@ -9,6 +9,32 @@ const DIFFICULTIES = {
     hard: { size: 16, mines: 40 }
 };
 
+let timerInterval = null;
+let secondsElapsed = 0;
+let timerStarted = false;
+
+function startTimer() {
+    if (timerStarted) return;
+    timerStarted = true;
+
+    timerInterval = setInterval(() => {
+        secondsElapsed++;
+        document.getElementById('timer').innerText = String(secondsElapsed).padStart(3, '0');
+    }, 1000);
+}
+
+function stopTimer() {
+    clearInterval(timerInterval);
+    timerInterval = null;
+}
+
+function resetTimer() {
+    stopTimer();
+    timerStarted = false;
+    secondsElapsed = 0;
+    document.getElementById('timer').innerText = "000";
+}
+
 document.getElementById('difficulty').addEventListener('change', (e) => {
     const customInputs = document.getElementById('custom-inputs');
     if (e.target.value === 'custom') {
@@ -20,6 +46,7 @@ document.getElementById('difficulty').addEventListener('change', (e) => {
 });
 
 async function startNewGame() {
+    resetTimer()
     isAutoSolving = false;
     document.getElementById('auto-btn').innerText = "Auto Solve";
 
@@ -109,8 +136,10 @@ function renderBoard(data) {
     });
 
     if (data.win) {
+        stopTimer()
         statusDiv.innerText = "🎉 You Won!";
     } else if (data.game_over) {
+        stopTimer()
         statusDiv.innerText = "💥 Game Over!";
     } else {
         statusDiv.innerText = "";
@@ -118,6 +147,9 @@ function renderBoard(data) {
 }
 
 async function handleCellClick(r, c) {
+    if (!timerStarted) {
+        startTimer();
+    }
     try {
         const response = await fetch(`${API_URL}/click`, {
             method: 'POST',
