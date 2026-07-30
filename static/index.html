@@ -21,7 +21,13 @@
         <option value="easy">Easy (8x8, 7 Mines)</option>
         <option value="medium" selected>Medium (10x10, 15 Mines)</option>
         <option value="hard">Hard (16x16, 40 Mines)</option>
+        <option value="custom">Custom...</option>
     </select>
+        <div id="custom-inputs" style="display: none; margin-top: 8px;">
+            <label>Size: <input type="number" id="custom-size" value="12" min="4" max="30" style="width: 50px;"></label>
+            <label>Mines: <input type="number" id="custom-mines" value="20" min="1" max="200" style="width: 50px;"></label>
+            <button onclick="startNewGame()">Confirm</button>
+        </div>
 
     </div>
 

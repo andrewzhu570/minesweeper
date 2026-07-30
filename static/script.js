@@ -9,7 +9,15 @@ const DIFFICULTIES = {
     hard: { size: 16, mines: 40 }
 };
 
-document.getElementById('difficulty').addEventListener('change', startNewGame);
+document.getElementById('difficulty').addEventListener('change', (e) => {
+    const customInputs = document.getElementById('custom-inputs');
+    if (e.target.value === 'custom') {
+        customInputs.style.display = 'block';
+    } else {
+        customInputs.style.display = 'none';
+        startNewGame();
+    }
+});
 
 async function startNewGame() {
     isAutoSolving = false;
@@ -17,12 +25,28 @@ async function startNewGame() {
 
     const selectedDiff = document.getElementById('difficulty').value;
     const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
+    let size, mines;
+
+    if (selectedDiff === 'custom') {
+        size = parseInt(document.getElementById('custom-size').value, 10) || 10;
+        mines = parseInt(document.getElementById('custom-mines').value, 10) || 15;
+
+        const maxMines = (size * size) - 1;
+        if (mines > maxMines) {
+            mines = maxMines;
+            document.getElementById('custom-mines').value = mines;
+        }
+    } else {
+        const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
+        size = config.size;
+        mines = config.mines;
+    }
 
     try {
         const response = await fetch(`${API_URL}/new-game`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ size: config.size, mines: config.mines})
+            body: JSON.stringify({ size: size, mines: mines})
         });
         const data = await response.json();
         renderBoard(data);
