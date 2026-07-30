@@ -68,3 +68,7 @@ background-color: #e2e8f0;
     font-size: 1.2rem;
     height: 1.5rem;
 }
+
+#timer {
+    margin-right: 20px;
+}

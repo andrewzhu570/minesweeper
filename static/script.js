@@ -19,7 +19,7 @@ function startTimer() {
 
     timerInterval = setInterval(() => {
         secondsElapsed++;
-        document.getElementById('timer').innerText = String(secondsElapsed).padStart(3, '0');
+        document.getElementById('timer').innerText = String(secondsElapsed).padStart(3, "0");
     }, 1000);
 }
 
@@ -50,24 +50,7 @@ async function startNewGame() {
     isAutoSolving = false;
     document.getElementById('auto-btn').innerText = "Auto Solve";
 
-    const selectedDiff = document.getElementById('difficulty').value;
-    const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
-    let size, mines;
-
-    if (selectedDiff === 'custom') {
-        size = parseInt(document.getElementById('custom-size').value, 10) || 10;
-        mines = parseInt(document.getElementById('custom-mines').value, 10) || 15;
-
-        const maxMines = (size * size) - 1;
-        if (mines > maxMines) {
-            mines = maxMines;
-            document.getElementById('custom-mines').value = mines;
-        }
-    } else {
-        const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
-        size = config.size;
-        mines = config.mines;
-    }
+    const{size, mines} = getSizeAndMines()
 
     try {
         const response = await fetch(`${API_URL}/new-game`, {
@@ -107,7 +90,7 @@ function renderBoard(data) {
         if (autoSolveBtn) autoSolveBtn.disabled = false;
         if (solveStepBtn) solveStepBtn.disabled = false;
     }
-
+    let flagged = 0
     data.grid.forEach((row, r) => {
         row.forEach((cell, c) => {
             const cellDiv = document.createElement('div');
@@ -123,6 +106,7 @@ function renderBoard(data) {
             } else if (cell.flagged) {
                 cellDiv.classList.add('flagged');
                 cellDiv.innerText = '🚩';
+                flagged++;
             }
 
             cellDiv.onclick = () => handleCellClick(r, c);
@@ -135,6 +119,8 @@ function renderBoard(data) {
         });
     });
 
+    const {size, mines} = getSizeAndMines()
+    document.getElementById("mines-count").innerText = String(mines - flagged)
     if (data.win) {
         stopTimer()
         statusDiv.innerText = "🎉 You Won!";
@@ -208,4 +194,26 @@ async function toggleAutoSolve() {
 
         await new Promise(res => setTimeout(res, 250));
     }
+}
+
+function getSizeAndMines() {
+    const selectedDiff = document.getElementById('difficulty').value;
+    const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
+    let size, mines;
+
+    if (selectedDiff === 'custom') {
+        size = parseInt(document.getElementById('custom-size').value, 10) || 10;
+        mines = parseInt(document.getElementById('custom-mines').value, 10) || 15;
+
+        const maxMines = (size * size) - 1;
+        if (mines > maxMines) {
+            mines = maxMines;
+            document.getElementById('custom-mines').value = mines;
+        }
+    } else {
+        const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
+        size = config.size;
+        mines = config.mines;
+    }
+    return {size, mines};
 }
