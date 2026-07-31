@@ -72,3 +72,17 @@ background-color: #e2e8f0;
 #timer {
     margin-right: 20px;
 }
+
+#mode-toggle-btn {
+    display: none;
+}
+
+
+@media (max-width: 768px) {
+    #mode-toggle-btn {
+        display: inline-block;
+        margin-bottom: 10px;
+        padding: 8px 16px;
+        font-size: 16px;
+    }
+}

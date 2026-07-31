@@ -1,6 +1,9 @@
 const API_URL = "/api";
 let isAutoSolving = false;
 let currentGameId = null
+let isFlagMode = false;
+
+
 
 window.onload = startNewGame;
 
@@ -13,6 +16,12 @@ const DIFFICULTIES = {
 let timerInterval = null;
 let secondsElapsed = 0;
 let timerStarted = false;
+
+function toggleMode() {
+    isFlagMode = !isFlagMode;
+    const btn = document.getElementById('mode-toggle-btn');
+    btn.innerText = isFlagMode ? "Mode: 🚩 Flag" : "Mode: 🔨 Dig";
+}
 
 function startTimer() {
     if (timerStarted) return;
@@ -111,7 +120,14 @@ function renderBoard(data) {
                 flagged++;
             }
 
-            cellDiv.onclick = () => handleCellClick(r, c);
+            cellDiv.onclick = () => {
+                if (isFlagMode) {
+                    handleCellFlag(r, c);
+                } else {
+                    handleCellClick(r, c);
+                }
+            };
+
             cellDiv.oncontextmenu = (e) => {
                 e.preventDefault();
                 handleCellFlag(r, c);
