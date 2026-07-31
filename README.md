@@ -1,22 +1,25 @@
 # 💣 Minesweeper with Custom Automated Solver
 
 
-
-<img width="711" height="443" alt="Screenshot 2026-07-20 at 6 37 29 PM" src="https://github.com/user-attachments/assets/6b994c9f-0c15-4bee-a17a-ff42f5d2ae79" />
-
+<img width="560" height="634" alt="Screenshot 2026-07-30 at 10 47 45 PM" src="https://github.com/user-attachments/assets/d58cd374-dab7-4643-adcd-9bd2d009ace1" />
 
 
-A full-featured desktop Minesweeper application built from scratch in Python, featuring dynamic board chording, multiple difficulty levels, and an automated solver engine that uses set-based inference logic.
 
+
+A full-stack Minesweeper web application built from scratch with Python (Flask) and JavaScript, featuring dynamic board chording, multiple difficulty levels, and an automated solver engine that uses set-based inference logic.
+
+Live Demo: https://minesweeper-buof.onrender.com
 ---
 
 ## Features
 
 ### Gameplay
-* **Interactive Tkinter GUI:** Clean layout with color-coded number displays, emojis, and visual status updates.
+* **Responsive Web Interface:** Clean layout built with HTML, CSS, and JS for smooth play on desktop and mobile browsers.
 * **First-Click Safety:** Relocates mines on your first click so you never hit a bomb on move one.
 * **Board Chording:** Middle/right click a number cell touching enough flags to quickly clear unflagged neighbor cells.
-* **Presets & Controls:** Features Easy ($8 \times 8$), Intermediate ($14 \times 14$), and Advanced ($20 \times 20$) modes with a live timer and flag counter.
+* **Presets & Controls:** Features Easy ($8 \times 8$), Intermediate ($10 \times 10$), and Advanced ($16 \times 16$) modes with a live timer and flag counter. An option to customize the size and mines is also included.
+* **Multi Device Support:** Tracks active game sessions using unique game_id UUIDs, preventing state collision across multiple browser tabs or concurrent users.
+
 
 ### Custom Solver Logic
 * **Step-by-Step & Auto-Play Modes:** Use `Solve Step` to reveal one logical move at a time or `Solve All` to let the program complete the board.
@@ -24,24 +27,15 @@ A full-featured desktop Minesweeper application built from scratch in Python, fe
 * **Set-Difference Inference:** Uses subset logic (`find_subset_moves`) to resolve complex, overlapping boundary scenarios.
 * **Benchmarking Suite:** Includes `benchmark.py` to test solver performance across hundreds of automated games.
 
-> **Note on OS Compatibility:** The user interface, button bindings (e.g., Mac trackpad right-clicks/two-finger taps), and typography are optimized for macOS. While the core game logic runs cross-platform, visual styling may render differently on Windows or Linux.
 ---
 
-## How to Run
 
-### Option 1: Standalone macOS App (No Python Required)
-1. Download **`main.zip`** from the latest GitHub Release.
-2. Unzip `main.zip` to extract **`main.app`**.
-3. **First-time setup:** Right-click `main.app` $\rightarrow$ select **Open** $\rightarrow$ click **Open** on the macOS security prompt.
+## Tech Stack
 
-### Option 2: From Source Code
-Ensure you have **Python 3** installed, then clone the repository and run `main.py`:
+* **Backend:** Python 3, Flask, Flask-CORS
+* **Frontend:** JavaScript, HTML, CSS
+* **Deployment:** Render
 
-```bash
-git clone [https://github.com/your-username/your-repo-name.git](https://github.com/your-username/your-repo-name.git)
-cd your-repo-name
-python3 main.py
-```
 
 
 
