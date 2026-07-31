@@ -25,7 +25,6 @@ Live Demo: https://minesweeper-buof.onrender.com
 * **Step-by-Step & Auto-Play Modes:** Use `Solve Step` to reveal one logical move at a time or `Solve All` to let the program complete the board.
 * **Deterministic Deduction:** Automatically places flags on guaranteed mines and reveals safe cells using neighborhood analysis.
 * **Set-Difference Inference:** Uses subset logic (`find_subset_moves`) to resolve complex, overlapping boundary scenarios.
-* **Benchmarking Suite:** Includes `benchmark.py` to test solver performance across hundreds of automated games.
 
 ---
 
