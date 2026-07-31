@@ -1,5 +1,6 @@
 const API_URL = "/api";
 let isAutoSolving = false;
+let currentGameId = null
 
 window.onload = startNewGame;
 
@@ -59,6 +60,7 @@ async function startNewGame() {
             body: JSON.stringify({ size: size, mines: mines})
         });
         const data = await response.json();
+        currentGameId = data.game_id
         renderBoard(data);
     } catch (err) {
         console.error("Failed to start new game:", err);
@@ -140,7 +142,7 @@ async function handleCellClick(r, c) {
         const response = await fetch(`${API_URL}/click`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ row: r, col: c })
+            body: JSON.stringify({ game_id: currentGameId, row: r, col: c })
         });
         const data = await response.json();
         renderBoard(data);
@@ -154,7 +156,7 @@ async function handleCellFlag(r, c) {
         const response = await fetch(`${API_URL}/flag`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ row: r, col: c })
+            body: JSON.stringify({ game_id: currentGameId, row: r, col: c })
         });
         const data = await response.json();
         renderBoard(data);
@@ -165,7 +167,11 @@ async function handleCellFlag(r, c) {
 
 async function stepSolve() {
     try{
-        const res = await fetch(`${API_URL}/solve-step`, { method: 'POST'});
+        const res = await fetch(`${API_URL}/solve-step`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({game_id: currentGameId})
+        });
         const data = await res.json();
         renderBoard(data)
 
@@ -198,7 +204,6 @@ async function toggleAutoSolve() {
 
 function getSizeAndMines() {
     const selectedDiff = document.getElementById('difficulty').value;
-    const config = DIFFICULTIES[selectedDiff] || DIFFICULTIES.medium;
     let size, mines;
 
     if (selectedDiff === 'custom') {

@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request, send_from_directory
 from flask_cors import CORS
+import uuid
 
 from minesweeper import Board
 from solver import Solver
@@ -7,30 +8,31 @@ from solver import Solver
 app = Flask(__name__, static_folder='static', static_url_path='')
 CORS(app)
 
+games = {}
+
 @app.route('/')
 def serve_index():
     return send_from_directory('static', 'index.html')
 
-board: Board | None = None
-solver: Solver | None = None
-
-current_size = 8
-current_mines = 7
 
 @app.route('/api/new-game', methods=["POST"])
 def new_game():
-    global board, solver, current_size, current_mines
     data = request.get_json() or {}
-    if 'size' in data and 'mines' in data:
-        current_size = data['size']
-        current_mines = data['mines']
-
-    board = Board(size=current_size, num_mines=current_mines)
+    size = data.get('size', 10)
+    mines = data.get('mines', 15)
+    board = Board(size=size, num_mines=mines)
     solver = Solver(board)
+
+    game_id = str(uuid.uuid4())
+    games[game_id] = {
+        'board': board,
+        'solver': solver
+    }
 
     return jsonify({
             "status": "success",
             "size": board.size,
+            "game_id": game_id,
             "num_mines": board.num_mines,
             "grid": board.get_board_state(),
             "game_over": board.game_over,
@@ -39,11 +41,18 @@ def new_game():
 
 @app.route('/api/click', methods=['POST'])
 def click():
-    global board, solver
-    if not board:
-        return jsonify({"error": "No active game. Start a new game first."}), 400
-
     data = request.get_json() or {}
+    game_id = data.get('game_id')
+
+    game_session = games.get(game_id)
+
+    if not game_session:
+        return jsonify({"error": "Game not found"}), 404
+
+    board = game_session['board']
+    solver = game_session['solver']
+
+
     r = data.get('row')
     c = data.get('col')
 
@@ -84,12 +93,16 @@ def click():
 
 @app.route('/api/flag', methods=['POST'])
 def flag():
-    global board
+    data = request.get_json() or {}
+    game_id = data.get('game_id')
+    game_session = games.get(game_id)
+    if not game_session:
+        return jsonify({"error": "Game not found"}), 404
+    board = game_session['board']
 
     if board is None:
         return jsonify({"error": "No active game. Start a new game first."}), 400
 
-    data = request.get_json() or {}
     r = data.get('row')
     c = data.get('col')
 
@@ -109,7 +122,13 @@ def flag():
 
 @app.route('/api/solve-step', methods=['POST'])
 def solve_step():
-    global board, solver
+    data = request.get_json() or {}
+    game_id = data.get('game_id')
+    game_session = games.get(game_id)
+    if not game_session:
+        return jsonify({"error": "Game not found"}), 404
+    board = game_session['board']
+    solver = game_session['solver']
 
     if board is None or solver is None:
         return jsonify({"error": "No active game. Start a new game first."}), 400
