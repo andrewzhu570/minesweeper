@@ -112,9 +112,15 @@ def flag():
     if r is None or c is None or not (0 <= r < board.size and 0 <= c < board.size):
         return jsonify({"error": "Invalid coordinates"}), 400
 
+    flag_count = sum(
+        cell.flagged
+        for row in board.grid
+        for cell in row
+    )
+
     cell = board.grid[r][c]
 
-    if not cell.revealed and not board.game_over:
+    if not cell.revealed and not board.game_over and flag_count < board.num_mines:
         cell.flagged = not cell.flagged
 
     return jsonify({
