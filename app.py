@@ -85,6 +85,9 @@ def click():
     else:
         board.reveal(r, c)
 
+    if board.game_over:
+        board.reveal_all()
+
     return jsonify({
         "grid": board.get_board_state(),
         "game_over": board.game_over,
@@ -149,6 +152,28 @@ def solve_step():
         "game_over": board.game_over,
         "win": board.check_win()
     })
+
+@app.route('/api/reveal-all', methods=['POST'])
+def reveal_all():
+    data = request.get_json() or {}
+    game_id = data.get('game_id')
+
+    game_session = games.get(game_id)
+
+    if not game_session:
+        return jsonify({"error": "Game not found"}), 404
+
+    board = game_session['board']
+
+    if not board.game_over:
+        return jsonify({"error": "Game is not over"}), 400
+
+    board.reveal_all()
+
+    return jsonify({
+        "grid": board.get_board_state()
+    })
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

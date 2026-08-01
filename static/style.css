@@ -86,3 +86,9 @@ background-color: #e2e8f0;
         touch-action: manipulation;
     }
 }
+
+.cell.wrong-flag {
+    background-color: #ffcccc;
+    color: #d9534f;
+    border: 1px solid #d9534f;
+}

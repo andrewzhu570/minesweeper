@@ -106,8 +106,11 @@ function renderBoard(data) {
         row.forEach((cell, c) => {
             const cellDiv = document.createElement('div');
             cellDiv.classList.add('cell');
-
-            if (cell.revealed) {
+            if (data.game_over && cell.flagged && !cell.has_mine) {
+                cellDiv.classList.add('wrong-flag');
+                cellDiv.innerText = '❌';
+            }
+            else if (cell.revealed) {
                 cellDiv.classList.add('revealed');
                 if (cell.has_mine) {
                     cellDiv.innerText = '💣';

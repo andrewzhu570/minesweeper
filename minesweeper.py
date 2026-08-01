@@ -102,6 +102,7 @@ class Board:
         for row in self.grid:
             display_row = []
             for cell in row:
+                cell.revealed = True
                 if cell.flagged:
                     value = "F"
                 elif cell.has_mine:
@@ -114,6 +115,8 @@ class Board:
             print("  ".join(display_row))
 
     def check_win(self):
+        if self.game_over:
+            return False
         for row in self.grid:
             for cell in row:
                 if not cell.has_mine and not cell.revealed:
