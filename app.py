@@ -120,6 +120,9 @@ def flag():
 
     cell = board.grid[r][c]
 
+    if flag_count >= board.num_mines:
+        if cell.flagged == True:
+            cell.flagged = not cell.flagged
     if not cell.revealed and not board.game_over and flag_count < board.num_mines:
         cell.flagged = not cell.flagged
 
